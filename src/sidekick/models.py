@@ -1,6 +1,6 @@
 from enum import Enum
-from datetime import datetime
-from pydantic import BaseModel
+from datetime import datetime, timezone
+from pydantic import BaseModel,Field
 
 class ActionStatus(str, Enum):
     PENDING = "pending"
@@ -36,11 +36,13 @@ class TaskStatus(str, Enum):
 class Task(BaseModel):
     task_id : str
     user_request : str
-    status: TaskStatus
-    plan = list[str] 
-    selected_tool = list[str]
-    result: str | None
-    created=datetime.now()
+    status: TaskStatus = TaskStatus.PENDING
+    plan: list[str] = Field(default_factory=list)
+    selected_tools: list[str] = Field(default_factory=list)
+    result: str | None = None
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
 
 
 
