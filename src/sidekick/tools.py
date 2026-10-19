@@ -14,9 +14,15 @@ class ToolRegistry():
             raise ValueError(f"Tool '{tool.name}' is already registered")
 
         self._tools[tool.name] = tool
-    def get(self , name:str) -> ToolDefinition:
+    def get(self, name: str) -> ToolDefinition:
         if name not in self._tools:
-            raise KeyError(f"{name} not found")
-        return self._tools
+            raise KeyError(f"Tool '{name}' not found")
+
+        return self._tools[name]
+    def get_all_descriptions(self) -> list[dict]:
+        return [
+        tool.model_dump()
+        for tool in self._tools.values()
+        ]
 
 
