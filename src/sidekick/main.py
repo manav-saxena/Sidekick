@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from sidekick.orchestrator import Orchestrator
 from sidekick.planner import Planner
 from sidekick.tools import ToolRegistry,ToolDefinition
+from sidekick.AI_planner import AIPlanner
 
 app = FastAPI(title="Sidekick API")
 
@@ -11,11 +12,12 @@ registry = ToolRegistry()
 registry.register(
     ToolDefinition(
         name = "search_emails",
-        description="Search emails by query"
+        description="Search emails by sender, subject, or keywords",
+        parameters={"query": "string"}
     )
 )
 
-planner = Planner(registry)
+planner = AIPlanner(registry)
 orchestrator = Orchestrator(planner)
 
 class TaskRequest(BaseModel):

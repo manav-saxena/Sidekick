@@ -44,6 +44,16 @@ class Task(BaseModel):
         default_factory=lambda: datetime.now(timezone.utc)
     )
 
+class Action(BaseModel):
+    action_id: str
+    task_id: str
+    action_type: str
+    payload: dict = Field(default_factory=dict)
+    status: ActionStatus = ActionStatus.PENDING
+    created_at: datetime
+    expires_at: datetime | None = None
+    approved_at: datetime | None = None
+
 
 
     
