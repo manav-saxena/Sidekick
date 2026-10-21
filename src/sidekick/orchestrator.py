@@ -74,3 +74,42 @@ class Orchestrator:
 
         return {"status":"completed",
                 "results": results,}
+
+    def excecute_approved_plan(self,action_id:str) ->dict:
+        action = self.approval_service.actions.get(action_id)
+
+        if action is None:
+            raise KeyError(f"Action '{action_id}' not found")
+
+        if action.status != ActionStatus.APPROVED:
+            raise PermissionError(
+            "Action must be approved before execution"
+        )
+        
+        tool = self.registry.get(action.action_type)
+
+        if not tool.requires_approval:
+            raise PermissionError(
+            "This action is not an approval-required tool"
+        )
+
+        action.status = ActionStatus.EXECUTING
+
+        try:
+            result = self.registry.execute(
+                action.action_type,
+                action.payload["arguments"],
+
+            )
+            action.status = ActionStatus.COMPLETED
+
+            return {
+                "status": "completed",
+                "action_id": action.action_id,
+                "result": result,
+            }
+
+        except Exception:
+            action.status = ActionStatus.FAILED
+            raise
+    
