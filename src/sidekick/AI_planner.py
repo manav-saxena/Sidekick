@@ -4,11 +4,11 @@ from dotenv import load_dotenv
 import os
 import json
 
-
 from sidekick.planner import PlanStep, TaskPlan
 from sidekick.tools import ToolRegistry
 
 load_dotenv(override=True)
+
 api_key = os.getenv("OPENROUTER_API_KEY")
 
 if not api_key:
