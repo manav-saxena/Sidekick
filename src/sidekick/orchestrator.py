@@ -3,6 +3,7 @@ from uuid import uuid4
 from sidekick.models import Task, TaskStatus, ActionStatus  
 from sidekick.planner import Planner, TaskPlan
 from sidekick.approvals import ApprovalService
+from datetime import datetime, timezone
 
 class Orchestrator:
     def __init__(self,planner:Planner,registry, approval_service:ApprovalService):
@@ -75,7 +76,7 @@ class Orchestrator:
         return {"status":"completed",
                 "results": results,}
 
-    def excecute_approved_plan(self,action_id:str) ->dict:
+    def excecute_approved_action(self,action_id:str) ->dict:
         action = self.approval_service.actions.get(action_id)
 
         if action is None:
@@ -85,6 +86,10 @@ class Orchestrator:
             raise PermissionError(
             "Action must be approved before execution"
         )
+        if action.expires_at is not None:
+            if datetime.now(timezone.utc) >= action.expires_at:
+                action.status = ActionStatus.EXPIRED
+                raise PermissionError("Approval has expired")
         
         tool = self.registry.get(action.action_type)
 
